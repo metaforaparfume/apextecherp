@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApexTech ERP – Supply Planning & Inventory Management</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <style>
+    /* =============================================
+       RESET & BASE
+    ============================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --apex-bg:         #0A0F1E;
+      --apex-surface:    #0F1629;
+      --apex-card:       #141C33;
+      --apex-card-hover: #172040;
+      --apex-border:     #1E2D4F;
+      --apex-border-mid: #243659;
+
+      --apex-blue:       #2A78D6;
+      --apex-blue-light: #3987E5;
+      --apex-blue-dim:   #1E3A6E;
+      --apex-blue-glow:  rgba(42, 120, 214, 0.15);
+
+      --apex-green:      #10B981;
+      --apex-green-dim:  #0A3D2A;
+      --apex-amber:      #F59E0B;
+      --apex-amber-dim:  #3D2800;
+      --apex-red:        #EF4444;
+      --apex-red-dim:    #3D0F0F;
+
+      --apex-text:       #E2E8F0;
+      --apex-muted:      #64748B;
+      --apex-subtle:     #94A3B8;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--apex-bg);
+      color: var(--apex-text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* =============================================
+       SCROLLBAR
+    ============================================= */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--apex-surface); }
+    ::-webkit-scrollbar-thumb { background: var(--apex-border-mid); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--apex-muted); }
+
+    /* =============================================
+       LAYOUT SHELL
+    ============================================= */
+    .shell {
+      display: grid;
+      grid-template-rows: 52px 44px 1fr;
+      min-height: 100vh;
+    }
+
+    /* =============================================
+       TOPBAR
+    ============================================= */
+    .topbar {
+      background: var(--apex-surface);
+      border-bottom: 1px solid var(--apex-border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: var(--apex-blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon i {
+      font-size: 16px;
+      color: #fff;
+    }
+
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--apex-text);
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--apex-muted);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      display: block;
+      margin-top: -2px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--apex-green);
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--apex-green);
+      border-radius: 50%;
+      animation: pulse-green 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.4px;
+      border: 1px solid;
+    }
+
+    .tag-blue  { border-color: var(--apex-blue); color: var(--apex-blue); }
+    .tag-green { border-color: var(--apex-green); color: var(--apex-green); }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--apex-blue-dim);
+      border: 1.5px solid var(--apex-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--apex-blue-light);
+      cursor: pointer;
+    }
+
+    /* =============================================
+       NAVBAR
+    ============================================= */
+    .navbar {
+      background: var(--apex-surface);
+      border-bottom: 1px solid var(--apex-border);
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      position: sticky;
+      top: 52px;
+      z-index: 99;
+    }
+
+    .nav-tab {
+      padding: 12px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--apex-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab i { font-size: 14px; }
+
+    .nav-tab:hover:not(.active) {
+      color: var(--apex-subtle);
+      border-bottom-color: var(--apex-border-mid);
+    }
+
+    .nav-tab.active {
+      color: var(--apex-blue);
+      border-bottom-color: var(--apex-blue);
+    }
+
+    /* =============================================
+       MAIN BODY
+    ============================================= */
+    .main {
+      padding: 20px 24px 40px;
+      overflow-y: auto;
+    }
+
+    .page { display: none; flex-direction: column; gap: 18px; }
+    .page.active { display: flex; }
+
+    /* =============================================
+       PIPELINE
+    ============================================= */
+    .pipeline-wrap {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--apex-muted);
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    .p-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      position: relative;
+    }
+
+    .p-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: calc(50% + 20px);
+      right: calc(-50% + 20px);
+      height: 1.5px;
+      background: var(--apex-border);
+      z-index: 0;
+      transition: background 0.4s;
+    }
+
+    .p-step.done:not(:last-child)::after {
+      background: var(--apex-blue);
+    }
+
+    .p-step-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .p-step.done .p-step-icon   { background: var(--apex-blue); border: 2px solid var(--apex-blue); }
+    .p-step.active .p-step-icon { background: var(--apex-amber-dim); border: 2px solid var(--apex-amber); animation: pulse-amber 1s ease-in-out infinite; }
+    .p-step.pending .p-step-icon{ background: var(--apex-card); border: 2px solid var(--apex-border); }
+    .p-step.warn .p-step-icon   { background: var(--apex-red-dim); border: 2px solid var(--apex-red); }
+
+    @keyframes pulse-amber {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.5); }
+      50%       { box-shadow: 0 0 0 6px rgba(245,158,11,0); }
+    }
+
+    .p-step-icon i { font-size: 13px; }
+    .p-step.done .p-step-icon i   { color: #fff; }
+    .p-step.active .p-step-icon i { color: var(--apex-amber); }
+    .p-step.pending .p-step-icon i{ color: var(--apex-muted); }
+    .p-step.warn .p-step-icon i   { color: var(--apex-red); }
+
+    .p-step-name {
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--apex-muted);
+      letter-spacing: 0.2px;
+      line-height: 1.3;
+    }
+
+    .p-step.done .p-step-name   { color: var(--apex-blue); }
+    .p-step.active .p-step-name { color: var(--apex-amber); }
+    .p-step.warn .p-step-name   { color: var(--apex-red); }
+
+    /* =============================================
+       KPI CARDS
+    ============================================= */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .kpi-card:hover { border-color: var(--apex-border-mid); }
+
+    .kpi-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--apex-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--apex-text);
+    }
+
+    .kpi-value.green { color: var(--apex-green); }
+    .kpi-value.amber { color: var(--apex-amber); }
+    .kpi-value.red   { color: var(--apex-red); }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--apex-muted);
+      margin-top: 5px;
+    }
+
+    /* =============================================
+       TWO-COLUMN CONTENT GRID
+    ============================================= */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    /* =============================================
+       PANEL (reusable card)
+    ============================================= */
+    .panel {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--apex-border);
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--apex-subtle);
+    }
+
+    .panel-action {
+      font-size: 11px;
+      color: var(--apex-blue);
+      cursor: pointer;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .panel-action:hover { color: var(--apex-blue-light); }
+
+    /* =============================================
+       TABLE (generic)
+    ============================================= */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--apex-muted);
+      font-weight: 600;
+      padding: 9px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--apex-border);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      font-size: 12px;
+      padding: 10px 18px;
+      border-bottom: 1px solid rgba(30,45,79,0.5);
+      color: var(--apex-text);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table tbody tr {
+      transition: background 0.15s;
+    }
+
+    .data-table tbody tr:hover td {
+      background: rgba(42,120,214,0.04);
+    }
+
+    .mat-id {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: var(--apex-blue);
+      font-weight: 600;
+    }
+
+    .mat-name  { font-weight: 600; color: var(--apex-text); }
+    .mat-code  { font-size: 10px; color: var(--apex-muted); margin-top: 2px; }
+
+    /* =============================================
+       STATUS PILL
+    ============================================= */
+    .pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .pill-ok   { background: var(--apex-green-dim); color: var(--apex-green); }
+    .pill-warn { background: var(--apex-amber-dim); color: var(--apex-amber); }
+    .pill-crit { background: var(--apex-red-dim);   color: var(--apex-red); }
+    .pill-info { background: var(--apex-blue-dim);  color: var(--apex-blue-light); }
+
+    /* =============================================
+       MINI STOCK BAR
+    ============================================= */
+    .stock-bar-bg {
+      width: 80px;
+      height: 5px;
+      background: var(--apex-border);
+      border-radius: 3px;
+      margin-top: 5px;
+    }
+
+    .stock-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    /* =============================================
+       ALERT LIST
+    ============================================= */
+    .alert-list {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border-left: 3px solid;
+    }
+
+    .alert-item.type-crit { background: rgba(239,68,68,0.07); border-color: var(--apex-red); }
+    .alert-item.type-warn { background: rgba(245,158,11,0.07); border-color: var(--apex-amber); }
+    .alert-item.type-info { background: rgba(42,120,214,0.07); border-color: var(--apex-blue); }
+
+    .alert-icon i { font-size: 16px; }
+    .alert-item.type-crit .alert-icon i { color: var(--apex-red); }
+    .alert-item.type-warn .alert-icon i { color: var(--apex-amber); }
+    .alert-item.type-info .alert-icon i { color: var(--apex-blue); }
+
+    .alert-body { flex: 1; }
+    .alert-title { font-size: 12px; font-weight: 700; color: var(--apex-text); margin-bottom: 2px; }
+    .alert-sub   { font-size: 11px; color: var(--apex-muted); line-height: 1.4; }
+    .alert-time  { font-size: 10px; color: var(--apex-muted); white-space: nowrap; margin-top: 2px; }
+
+    /* =============================================
+       AI PLANNER PANEL
+    ============================================= */
+    .ai-panel {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .ai-panel-head {
+      background: #0D1830;
+      border-bottom: 1px solid var(--apex-border);
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ai-head-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .ai-icon-wrap {
+      width: 26px;
+      height: 26px;
+      background: var(--apex-blue);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-icon-wrap i { font-size: 13px; color: #fff; }
+
+    .ai-panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--apex-subtle);
+    }
+
+    .ai-beta {
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(42,120,214,0.2);
+      color: var(--apex-blue-light);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .ai-body {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ai-quick-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .ai-chip {
+      font-size: 11px;
+      padding: 5px 11px;
+      border-radius: 20px;
+      border: 1px solid var(--apex-border-mid);
+      color: var(--apex-subtle);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      font-family: inherit;
+    }
+
+    .ai-chip:hover {
+      border-color: var(--apex-blue);
+      color: var(--apex-blue-light);
+      background: var(--apex-blue-glow);
+    }
+
+    .ai-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .ai-textarea {
+      flex: 1;
+      background: rgba(42,120,214,0.06);
+      border: 1px solid var(--apex-blue-dim);
+      border-radius: var(--radius-sm);
+      padding: 9px 13px;
+      font-size: 12px;
+      color: var(--apex-text);
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      line-height: 1.5;
+      min-height: 40px;
+      transition: border-color 0.2s;
+    }
+
+    .ai-textarea::placeholder { color: var(--apex-muted); }
+    .ai-textarea:focus { border-color: var(--apex-blue); }
+
+    .ai-send-btn {
+      background: var(--apex-blue);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 9px 16px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .ai-send-btn:hover  { background: #1E5FAD; }
+    .ai-send-btn:active { background: #174D96; }
+
+    .ai-response-box {
+      background: rgba(42,120,214,0.05);
+      border: 1px solid var(--apex-blue-dim);
+      border-radius: var(--radius-sm);
+      padding: 13px 15px;
+      min-height: 90px;
+    }
+
+    .ai-response-text {
+      font-size: 12px;
+      color: var(--apex-subtle);
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    /* =============================================
+       FORECAST PAGE
+    ============================================= */
+    .chart-panel {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+    }
+
+    .chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--apex-muted);
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 220px;
+    }
+
+    .progress-wrap {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .progress-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .progress-label { color: var(--apex-subtle); font-weight: 500; }
+    .progress-pct   { font-weight: 700; }
+
+    .progress-bg {
+      height: 5px;
+      background: var(--apex-border);
+      border-radius: 3px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* =============================================
+       MRP PAGE
+    ============================================= */
+    .mrp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(30,45,79,0.5);
+      gap: 16px;
+      transition: background 0.15s;
+    }
+
+    .mrp-row:last-of-type { border-bottom: none; }
+    .mrp-row:hover        { background: rgba(42,120,214,0.03); }
+
+    .mrp-info  { flex: 1; }
+    .mrp-name  { font-size: 13px; font-weight: 700; color: var(--apex-text); margin-bottom: 3px; }
+    .mrp-meta  { font-size: 11px; color: var(--apex-muted); line-height: 1.5; }
+
+    .mrp-qty-wrap { text-align: right; min-width: 120px; }
+    .mrp-qty-num  { font-size: 15px; font-weight: 800; color: var(--apex-amber); }
+    .mrp-qty-unit { font-size: 10px; color: var(--apex-muted); }
+    .mrp-pr-tag   { font-size: 10px; font-weight: 700; margin-top: 4px; }
+
+    .approve-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--apex-blue);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 11px 20px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      font-family: inherit;
+      margin: 14px 18px;
+      transition: background 0.2s;
+    }
+
+    .approve-btn:hover  { background: #1E5FAD; }
+    .approve-btn:active { background: #174D96; }
+
+    /* =============================================
+       PO PAGE
+    ============================================= */
+    .po-item {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(30,45,79,0.5);
+      transition: background 0.15s;
+    }
+
+    .po-item:last-child { border-bottom: none; }
+    .po-item:hover      { background: rgba(42,120,214,0.03); }
+
+    .po-number { font-family: monospace; font-size: 11px; font-weight: 700; color: var(--apex-blue); }
+    .po-vendor { font-size: 13px; font-weight: 700; color: var(--apex-text); margin-bottom: 2px; }
+    .po-detail { font-size: 11px; color: var(--apex-muted); }
+    .po-right  { text-align: right; }
+    .po-amount { font-size: 13px; font-weight: 700; color: var(--apex-text); margin-bottom: 4px; }
+
+    /* =============================================
+       VENDOR PAGE
+    ============================================= */
+    .vendor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .vendor-card {
+      background: var(--apex-card);
+      border: 1px solid var(--apex-border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .vendor-card:hover { border-color: var(--apex-border-mid); }
+
+    .vendor-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .v-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .v-name { font-size: 13px; font-weight: 700; color: var(--apex-text); margin-bottom: 2px; }
+    .v-cat  { font-size: 10px; color: var(--apex-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+    .v-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .v-metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .v-ml { font-size: 11px; color: var(--apex-muted); }
+    .v-mv { font-size: 11px; font-weight: 700; }
+    .v-mv.green { color: var(--apex-green); }
+    .v-mv.amber { color: var(--apex-amber); }
+    .v-mv.red   { color: var(--apex-red); }
+
+    .v-score-bar {
+      margin-top: 10px;
+    }
+
+    .v-score-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--apex-muted);
+      margin-bottom: 5px;
+    }
+
+    .v-bar-bg   { height: 5px; background: var(--apex-border); border-radius: 3px; }
+    .v-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+    /* =============================================
+       SPINNER ANIMATION
+    ============================================= */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .spinning { animation: spin 0.8s linear infinite; display: inline-block; }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 900px) {
+      .kpi-row     { grid-template-columns: repeat(2, 1fr); }
+      .content-grid{ grid-template-columns: 1fr; }
+      .vendor-grid { grid-template-columns: 1fr; }
+      .po-item     { grid-template-columns: 1fr auto; }
+      .po-number   { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .main    { padding: 14px 14px 30px; }
+      .topbar  { padding: 0 14px; }
+      .navbar  { padding: 0 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ==================== TOPBAR ==================== -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="ti ti-topology-star-ring"></i>
+      </div>
+      <div class="logo-text">
+        ApexTech ERP
+        <span class="logo-sub">Supply Planning &amp; Inventory Management</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Live
+      </div>
+      <span class="tag tag-blue">S/4HANA Inspired</span>
+      <div class="avatar" title="Admin User">AD</div>
+    </div>
+  </header>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar">
+    <div class="nav-tab active" data-page="dashboard">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </div>
+    <div class="nav-tab" data-page="forecast">
+      <i class="ti ti-chart-arrows-vertical"></i> Demand Forecast
+    </div>
+    <div class="nav-tab" data-page="stock">
+      <i class="ti ti-package"></i> Stock
+    </div>
+    <div class="nav-tab" data-page="mrp">
+      <i class="ti ti-settings-cog"></i> MRP
+    </div>
+    <div class="nav-tab" data-page="po">
+      <i class="ti ti-file-invoice"></i> Purchase Orders
+    </div>
+    <div class="nav-tab" data-page="vendor">
+      <i class="ti ti-truck"></i> Vendor Management
+    </div>
+  </nav>
+
+  <!-- ==================== MAIN ==================== -->
+  <main class="main">
+
+    <!-- ===== PAGE: DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- Pipeline -->
+      <div class="pipeline-wrap">
+        <div class="section-label">Workflow Pipeline — Active Cycle</div>
+        <div class="pipeline">
+          <div class="p-step done">
+            <div class="p-step-icon"><i class="ti ti-chart-arrows-vertical"></i></div>
+            <div class="p-step-name">Demand<br>Forecast</div>
+          </div>
+          <div class="p-step warn">
+            <div class="p-step-icon"><i class="ti ti-package"></i></div>
+            <div class="p-step-name">Stock<br>Verify</div>
+          </div>
+          <div class="p-step active">
+            <div class="p-step-icon"><i class="ti ti-settings-cog"></i></div>
+            <div class="p-step-name">MRP<br>Run</div>
+          </div>
+          <div class="p-step pending">
+            <div class="p-step-icon"><i class="ti ti-file-invoice"></i></div>
+            <div class="p-step-name">Purchase<br>Order</div>
+          </div>
+          <div class="p-step pending">
+            <div class="p-step-icon"><i class="ti ti-truck"></i></div>
+            <div class="p-step-name">Vendor<br>Dispatch</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Stock Items</div>
+          <div class="kpi-value">247</div>
+          <div class="kpi-sub">SKUs tracked</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Critical Alerts</div>
+          <div class="kpi-value red">3</div>
+          <div class="kpi-sub">Stockout risk</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Open POs</div>
+          <div class="kpi-value amber">12</div>
+          <div class="kpi-sub">Pending approval</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Fill Rate</div>
+          <div class="kpi-value green">94%</div>
+          <div class="kpi-sub">7-day average</div>
+        </div>
+      </div>
+
+      <!-- Two-column: Inventory + Alerts -->
+      <div class="content-grid">
+
+        <!-- Inventory Table -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Inventory Status</span>
+            <span class="panel-action" onclick="goToPage('stock')">View all →</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>On Hand</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="mat-name">GPU RTX 4080</div>
+                  <div class="mat-code">MAT-0041</div>
+                </td>
+                <td>
+                  <div>38 units</div>
+                  <div class="stock-bar-bg">
+                    <div class="stock-bar-fill" style="width:15%; background:var(--apex-red);"></div>
+                  </div>
+                </td>
+                <td><span class="pill pill-crit">Critical</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="mat-name">DDR5 RAM 32GB</div>
+                  <div class="mat-code">MAT-0087</div>
+                </td>
+                <td>
+                  <div>215 units</div>
+                  <div class="stock-bar-bg">
+                    <div class="stock-bar-fill" style="width:72%; background:var(--apex-green);"></div>
+                  </div>
+                </td>
+                <td><span class="pill pill-ok">OK</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="mat-name">NVMe SSD 1TB</div>
+                  <div class="mat-code">MAT-0103</div>
+                </td>
+                <td>
+                  <div>82 units</div>
+                  <div class="stock-bar-bg">
+                    <div class="stock-bar-fill" style="width:35%; background:var(--apex-amber);"></div>
+                  </div>
+                </td>
+                <td><span class="pill pill-warn">Low</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="mat-name">Intel Core i9-14900K</div>
+                  <div class="mat-code">MAT-0055</div>
+                </td>
+                <td>
+                  <div>14 units</div>
+                  <div class="stock-bar-bg">
+                    <div class="stock-bar-fill" style="width:9%; background:var(--apex-red);"></div>
+                  </div>
+                </td>
+                <td><span class="pill pill-crit">Critical</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="mat-name">PSU 850W Gold</div>
+                  <div class="mat-code">MAT-0162</div>
+                </td>
+                <td>
+                  <div>304 units</div>
+                  <div class="stock-bar-bg">
+                    <div class="stock-bar-fill" style="width:88%; background:var(--apex-green);"></div>
+                  </div>
+                </td>
+                <td><span class="pill pill-ok">OK</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Alerts -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">System Alerts</span>
+            <span style="font-size:11px; color:var(--apex-red); font-weight:700;">3 Critical</span>
+          </div>
+          <div class="alert-list">
+            <div class="alert-item type-crit">
+              <div class="alert-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="alert-body">
+                <div class="alert-title">Stockout Risk — GPU RTX 4080</div>
+                <div class="alert-sub">Projected stockout in 4 days. Purchase Requisition auto-generated.</div>
+              </div>
+              <div class="alert-time">2m ago</div>
+            </div>
+            <div class="alert-item type-crit">
+              <div class="alert-icon"><i class="ti ti-alert-triangle"></i></div>
+              <div class="alert-body">
+                <div class="alert-title">Stockout Risk — Intel Core i9</div>
+                <div class="alert-sub">Safety stock breached. EOQ = 120 units recommended.</div>
+              </div>
+              <div class="alert-time">8m ago</div>
+            </div>
+            <div class="alert-item type-warn">
+              <div class="alert-icon"><i class="ti ti-clock-exclamation"></i></div>
+              <div class="alert-body">
+                <div class="alert-title">Vendor Delay — NexaSemi Corp</div>
+                <div class="alert-sub">PO-2024-089 delayed 3 days. Alternate vendor suggested.</div>
+              </div>
+              <div class="alert-time">45m ago</div>
+            </div>
+            <div class="alert-item type-warn">
+              <div class="alert-icon"><i class="ti ti-package"></i></div>
+              <div class="alert-body">
+                <div class="alert-title">Low Stock — Motherboard Z790</div>
+                <div class="alert-sub">Stock nearing reorder point. Review MRP recommendation.</div>
+              </div>
+              <div class="alert-time">1h ago</div>
+            </div>
+            <div class="alert-item type-info">
+              <div class="alert-icon"><i class="ti ti-check"></i></div>
+              <div class="alert-body">
+                <div class="alert-title">MRP Run Completed</div>
+                <div class="alert-sub">5 purchase requisitions generated automatically.</div>
+              </div>
+              <div class="alert-time">1h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Supply Planner -->
+      <div class="ai-panel">
+        <div class="ai-panel-head">
+          <div class="ai-head-left">
+            <div class="ai-icon-wrap"><i class="ti ti-sparkles"></i></div>
+            <span class="ai-panel-title">AI Supply Planner</span>
+            <span class="ai-beta">POWERED BY CLAUDE</span>
+          </div>
+          <span class="tag tag-green">Online</span>
+        </div>
+        <div class="ai-body">
+          <div class="ai-quick-prompts">
+            <button class="ai-chip" onclick="fillPrompt(this)">Analisis risiko stok GPU RTX 4080</button>
+            <button class="ai-chip" onclick="fillPrompt(this)">Rekomendasikan EOQ untuk item critical</button>
+            <button class="ai-chip" onclick="fillPrompt(this)">Vendor mana yang harus diganti?</button>
+            <button class="ai-chip" onclick="fillPrompt(this)">Generate laporan supply chain summary</button>
+          </div>
+          <div class="ai-input-row">
+            <textarea
+              class="ai-textarea"
+              id="ai-input"
+              rows="2"
+              placeholder="Tanya AI Supply Planner: analisis stok, rekomendasi PO, evaluasi vendor..."
+            ></textarea>
+            <button class="ai-send-btn" onclick="sendToAI()">
+              <i class="ti ti-send"></i> Kirim
+            </button>
+          </div>
+          <div class="ai-response-box">
+            <div class="ai-response-text" id="ai-response">
+              Siap membantu perencanaan supply chain ApexTech Logistics. Pilih prompt di atas atau ketik pertanyaan Anda...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: DEMAND FORECAST ===== -->
+    <div class="page" id="page-forecast">
+
+      <!-- Chart -->
+      <div class="chart-panel">
+        <div class="chart-head">
+          <span class="panel-title">Demand Forecast — Next 8 Weeks</span>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--apex-blue);"></div>
+              Actual
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:var(--apex-amber);"></div>
+              Forecast
+            </div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="forecastChart"></canvas>
+        </div>
+      </div>
+
+      <div class="content-grid">
+
+        <!-- Top Demand Items -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Top Demand Items</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Weekly Avg</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPU RTX 4080</td>
+                <td>52 units</td>
+                <td style="color:var(--apex-red); font-weight:700;">▲ +34%</td>
+              </tr>
+              <tr>
+                <td>Intel Core i9-14900K</td>
+                <td>38 units</td>
+                <td style="color:var(--apex-red); font-weight:700;">▲ +21%</td>
+              </tr>
+              <tr>
+                <td>NVMe SSD 1TB</td>
+                <td>87 units</td>
+                <td style="color:var(--apex-amber); font-weight:700;">▲ +8%</td>
+              </tr>
+              <tr>
+                <td>DDR5 RAM 32GB</td>
+                <td>124 units</td>
+                <td style="color:var(--apex-green); font-weight:700;">▼ -3%</td>
+              </tr>
+              <tr>
+                <td>Motherboard Z790</td>
+                <td>41 units</td>
+                <td style="color:var(--apex-amber); font-weight:700;">▲ +5%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Forecast Accuracy -->
+        <div class="panel">
+          <div class="panel-head">
+            <span class="panel-title">Forecast Accuracy (MAPE)</span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-row">
+              <div class="progress-meta">
+                <span class="progress-label">GPU RTX 4080</span>
+                <span class="progress-pct" style="color:var(--apex-green);">87%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:87%; background:var(--apex-green);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-meta">
+                <span class="progress-label">Intel Core i9-14900K</span>
+                <span class="progress-pct" style="color:var(--apex-blue);">91%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:91%; background:var(--apex-blue);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-meta">
+                <span class="progress-label">NVMe SSD 1TB</span>
+                <span class="progress-pct" style="color:var(--apex-amber);">78%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:78%; background:var(--apex-amber);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-meta">
+                <span class="progress-label">DDR5 RAM 32GB</span>
+                <span class="progress-pct" style="color:var(--apex-green);">95%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:95%; background:var(--apex-green);"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-meta">
+                <span class="progress-label">Motherboard Z790</span>
+                <span class="progress-pct" style="color:var(--apex-blue);">82%</span>
+              </div>
+              <div class="progress-bg"><div class="progress-fill" style="width:82%; background:var(--apex-blue);"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== PAGE: STOCK VERIFICATION ===== -->
+    <div class="page" id="page-stock">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Stock Verification — All Materials</span>
+          <span class="panel-action" onclick="exportCSV()">
+            <i class="ti ti-download" style="vertical-align:-2px; margin-right:4px;"></i>Export CSV
+          </span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Material ID</th>
+              <th>Description</th>
+              <th>On Hand</th>
+              <th>Safety Stock</th>
+              <th>Reorder Point</th>
+              <th>EOQ</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mat-id">MAT-0041</td>
+              <td>GPU RTX 4080</td>
+              <td>38</td>
+              <td>80</td>
+              <td>100</td>
+              <td style="color:var(--apex-amber); font-weight:700;">150</td>
+              <td><span class="pill pill-crit">Critical</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0055</td>
+              <td>Intel Core i9-14900K</td>
+              <td>14</td>
+              <td>50</td>
+              <td>75</td>
+              <td style="color:var(--apex-amber); font-weight:700;">120</td>
+              <td><span class="pill pill-crit">Critical</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0103</td>
+              <td>NVMe SSD 1TB Gen4</td>
+              <td>82</td>
+              <td>60</td>
+              <td>100</td>
+              <td style="color:var(--apex-amber); font-weight:700;">200</td>
+              <td><span class="pill pill-warn">Low</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0119</td>
+              <td>Motherboard Z790</td>
+              <td>67</td>
+              <td>40</td>
+              <td>60</td>
+              <td style="color:var(--apex-amber); font-weight:700;">80</td>
+              <td><span class="pill pill-warn">Low</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0087</td>
+              <td>DDR5 RAM 32GB Kit</td>
+              <td>215</td>
+              <td>80</td>
+              <td>120</td>
+              <td style="color:var(--apex-muted);">—</td>
+              <td><span class="pill pill-ok">OK</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0162</td>
+              <td>PSU 850W Gold</td>
+              <td>304</td>
+              <td>100</td>
+              <td>150</td>
+              <td style="color:var(--apex-muted);">—</td>
+              <td><span class="pill pill-ok">OK</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0178</td>
+              <td>CPU Cooler 360mm AIO</td>
+              <td>188</td>
+              <td>60</td>
+              <td>90</td>
+              <td style="color:var(--apex-muted);">—</td>
+              <td><span class="pill pill-ok">OK</span></td>
+            </tr>
+            <tr>
+              <td class="mat-id">MAT-0201</td>
+              <td>Case ATX Mid-Tower</td>
+              <td>143</td>
+              <td>50</td>
+              <td>80</td>
+              <td style="color:var(--apex-muted);">—</td>
+              <td><span class="pill pill-ok">OK</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: MRP ===== -->
+    <div class="page" id="page-mrp">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title">MRP — Auto-Generated Material Requirements</span>
+          <span class="panel-action" style="color:var(--apex-green);">
+            <i class="ti ti-refresh" style="vertical-align:-2px; margin-right:4px;"></i>Last run: 1h ago
+          </span>
+        </div>
+
+        <div class="mrp-row">
+          <div class="mrp-info">
+            <div class="mrp-name">GPU RTX 4080</div>
+            <div class="mrp-meta">
+              MAT-0041 &nbsp;·&nbsp; Vendor: NexaSemi Corp &nbsp;·&nbsp; Lead time: 7 hari
+            </div>
+          </div>
+          <div class="mrp-qty-wrap">
+            <div class="mrp-qty-num">150 <span class="mrp-qty-unit">units</span></div>
+            <div class="mrp-pr-tag" style="color:var(--apex-red);">PR Auto-Created</div>
+          </div>
+          <span class="pill pill-crit">Critical</span>
+        </div>
+
+        <div class="mrp-row">
+          <div class="mrp-info">
+            <div class="mrp-name">Intel Core i9-14900K</div>
+            <div class="mrp-meta">
+              MAT-0055 &nbsp;·&nbsp; Vendor: SiliconBridge Ltd &nbsp;·&nbsp; Lead time: 5 hari
+            </div>
+          </div>
+          <div class="mrp-qty-wrap">
+            <div class="mrp-qty-num">120 <span class="mrp-qty-unit">units</span></div>
+            <div class="mrp-pr-tag" style="color:var(--apex-red);">PR Auto-Created</div>
+          </div>
+          <span class="pill pill-crit">Critical</span>
+        </div>
+
+        <div class="mrp-row">
+          <div class="mrp-info">
+            <div class="mrp-name">NVMe SSD 1TB Gen4</div>
+            <div class="mrp-meta">
+              MAT-0103 &nbsp;·&nbsp; Vendor: StoragePro Asia &nbsp;·&nbsp; Lead time: 4 hari
+            </div>
+          </div>
+          <div class="mrp-qty-wrap">
+            <div class="mrp-qty-num">200 <span class="mrp-qty-unit">units</span></div>
+            <div class="mrp-pr-tag" style="color:var(--apex-amber);">Pending Review</div>
+          </div>
+          <span class="pill pill-warn">Low</span>
+        </div>
+
+        <div class="mrp-row">
+          <div class="mrp-info">
+            <div class="mrp-name">Motherboard Z790</div>
+            <div class="mrp-meta">
+              MAT-0119 &nbsp;·&nbsp; Vendor: PCBWorld Inc &nbsp;·&nbsp; Lead time: 6 hari
+            </div>
+          </div>
+          <div class="mrp-qty-wrap">
+            <div class="mrp-qty-num">80 <span class="mrp-qty-unit">units</span></div>
+            <div class="mrp-pr-tag" style="color:var(--apex-amber);">Pending Review</div>
+          </div>
+          <span class="pill pill-warn">Low</span>
+        </div>
+
+        <div class="mrp-row">
+          <div class="mrp-info">
+            <div class="mrp-name">DDR5 RAM 32GB Kit</div>
+            <div class="mrp-meta">
+              MAT-0087 &nbsp;·&nbsp; Vendor: MemCore Technologies &nbsp;·&nbsp; Lead time: 3 hari
+            </div>
+          </div>
+          <div class="mrp-qty-wrap">
+            <div class="mrp-qty-num">300 <span class="mrp-qty-unit">units</span></div>
+            <div class="mrp-pr-tag" style="color:var(--apex-blue-light);">Scheduled</div>
+          </div>
+          <span class="pill pill-info">Planned</span>
+        </div>
+
+        <button class="approve-btn" onclick="approveMRP()">
+          <i class="ti ti-file-plus"></i>
+          Approve &amp; Convert All to Purchase Order
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== PAGE: PURCHASE ORDERS ===== -->
+    <div class="page" id="page-po">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title">Purchase Orders</span>
+          <span class="panel-action">
+            <i class="ti ti-plus" style="vertical-align:-2px; margin-right:4px;"></i>New PO
+          </span>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-091</div>
+          <div>
+            <div class="po-vendor">NexaSemi Corp</div>
+            <div class="po-detail">GPU RTX 4080 &nbsp;·&nbsp; Qty: 150 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$127,500</div>
+            <span class="pill pill-crit">Urgent</span>
+          </div>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-090</div>
+          <div>
+            <div class="po-vendor">SiliconBridge Ltd</div>
+            <div class="po-detail">Intel Core i9-14900K &nbsp;·&nbsp; Qty: 120 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$63,000</div>
+            <span class="pill pill-warn">Processing</span>
+          </div>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-089</div>
+          <div>
+            <div class="po-vendor">StoragePro Asia</div>
+            <div class="po-detail">NVMe SSD 1TB Gen4 &nbsp;·&nbsp; Qty: 200 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$30,000</div>
+            <span class="pill pill-warn">Delayed +3d</span>
+          </div>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-088</div>
+          <div>
+            <div class="po-vendor">MemCore Technologies</div>
+            <div class="po-detail">DDR5 RAM 32GB Kit &nbsp;·&nbsp; Qty: 300 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$39,000</div>
+            <span class="pill pill-ok">Confirmed</span>
+          </div>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-087</div>
+          <div>
+            <div class="po-vendor">PCBWorld Inc</div>
+            <div class="po-detail">Motherboard Z790 &nbsp;·&nbsp; Qty: 80 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$28,800</div>
+            <span class="pill pill-ok">Confirmed</span>
+          </div>
+        </div>
+
+        <div class="po-item">
+          <div class="po-number">PO-2024-086</div>
+          <div>
+            <div class="po-vendor">ThermalLogic Asia</div>
+            <div class="po-detail">CPU Cooler 360mm AIO &nbsp;·&nbsp; Qty: 60 units</div>
+          </div>
+          <div class="po-right">
+            <div class="po-amount">$9,600</div>
+            <span class="pill pill-ok">Delivered</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== PAGE: VENDOR MANAGEMENT ===== -->
+    <div class="page" id="page-vendor">
+      <div class="vendor-grid">
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#1E40AF;">NS</div>
+            <div>
+              <div class="v-name">NexaSemi Corp</div>
+              <div class="v-cat">GPU &amp; High-End Components</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv amber">78%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">7 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">3</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-warn" style="font-size:10px;">Delay Risk</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-amber); font-weight:700;">78 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:78%; background:var(--apex-amber);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#065F46;">SB</div>
+            <div>
+              <div class="v-name">SiliconBridge Ltd</div>
+              <div class="v-cat">CPU &amp; Processors</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv green">94%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">5 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">2</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-ok" style="font-size:10px;">Preferred</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-green); font-weight:700;">94 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:94%; background:var(--apex-green);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#6D28D9;">SP</div>
+            <div>
+              <div class="v-name">StoragePro Asia</div>
+              <div class="v-cat">Storage &amp; SSD / NVMe</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv red">61%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">4 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">1</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-crit" style="font-size:10px;">Under Review</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-red); font-weight:700;">61 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:61%; background:var(--apex-red);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#0F4C75;">MC</div>
+            <div>
+              <div class="v-name">MemCore Technologies</div>
+              <div class="v-cat">RAM &amp; Memory Modules</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv green">97%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">3 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">2</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-ok" style="font-size:10px;">Top Vendor</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-green); font-weight:700;">97 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:97%; background:var(--apex-green);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#92400E;">PW</div>
+            <div>
+              <div class="v-name">PCBWorld Inc</div>
+              <div class="v-cat">Motherboard &amp; PCB</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv green">88%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">6 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">1</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-ok" style="font-size:10px;">Active</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-blue-light); font-weight:700;">88 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:88%; background:var(--apex-blue);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vendor-card">
+          <div class="vendor-head">
+            <div class="v-avatar" style="background:#1F4E3D;">TL</div>
+            <div>
+              <div class="v-name">ThermalLogic Asia</div>
+              <div class="v-cat">Cooling &amp; Thermal Solutions</div>
+            </div>
+          </div>
+          <div class="v-metrics">
+            <div class="v-metric">
+              <span class="v-ml">On-time delivery</span>
+              <span class="v-mv green">92%</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Avg lead time</span>
+              <span class="v-mv">5 hari</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Active POs</span>
+              <span class="v-mv">0</span>
+            </div>
+            <div class="v-metric">
+              <span class="v-ml">Status</span>
+              <span class="pill pill-info" style="font-size:10px;">Standby</span>
+            </div>
+          </div>
+          <div class="v-score-bar">
+            <div class="v-score-meta">
+              <span>Vendor Score</span>
+              <span style="color:var(--apex-blue-light); font-weight:700;">92 / 100</span>
+            </div>
+            <div class="v-bar-bg">
+              <div class="v-bar-fill" style="width:92%; background:var(--apex-blue);"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- =============================================
+     JAVASCRIPT
+============================================= -->
+<script>
+  /* ---------- NAVIGATION ---------- */
+  const tabs  = document.querySelectorAll('.nav-tab');
+  const pages = document.querySelectorAll('.page');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.page;
+      goToPage(target);
+    });
+  });
+
+  function goToPage(target) {
+    tabs.forEach(t => {
+      t.classList.toggle('active', t.dataset.page === target);
+    });
+    pages.forEach(p => {
+      p.classList.toggle('active', p.id === 'page-' + target);
+    });
+    if (target === 'forecast' && !window._forecastChartBuilt) {
+      setTimeout(buildForecastChart, 80);
+      window._forecastChartBuilt = true;
+    }
+  }
+
+  /* ---------- FORECAST CHART ---------- */
+  function buildForecastChart() {
+    const canvas = document.getElementById('forecastChart');
+    if (!canvas) return;
+
+    new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'],
+        datasets: [
+          {
+            label: 'Actual Demand',
+            data: [310, 345, 390, 420, 380, null, null, null],
+            borderColor: '#2A78D6',
+            backgroundColor: 'rgba(42,120,214,0.08)',
+            borderWidth: 2,
+            pointRadius: 5,
+            pointBackgroundColor: '#2A78D6',
+            fill: true,
+            tension: 0.4,
+            spanGaps: false
+          },
+          {
+            label: 'Forecast',
+            data: [null, null, null, null, 380, 440, 510, 495],
+            borderColor: '#F59E0B',
+            backgroundColor: 'rgba(245,158,11,0.06)',
+            borderWidth: 2,
+            borderDash: [6, 4],
+            pointRadius: 5,
+            pointBackgroundColor: '#F59E0B',
+            fill: true,
+            tension: 0.4,
+            spanGaps: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#64748B', font: { size: 11 } },
+            grid:  { color: 'rgba(30,45,79,0.7)' },
+            border:{ color: '#1E2D4F' }
+          },
+          y: {
+            ticks: { color: '#64748B', font: { size: 11 } },
+            grid:  { color: 'rgba(30,45,79,0.7)' },
+            border:{ color: '#1E2D4F' }
+          }
+        }
+      }
+    });
+  }
+
+  /* ---------- MRP APPROVE ---------- */
+  function approveMRP() {
+    if (confirm('Approve semua 5 Purchase Requisitions dan convert ke Purchase Order?')) {
+      alert('✅ Berhasil! 5 PO baru telah dibuat:\n• PO-2024-092 — GPU RTX 4080 × 150\n• PO-2024-093 — Intel Core i9 × 120\n• PO-2024-094 — NVMe SSD × 200\n• PO-2024-095 — Motherboard Z790 × 80\n• PO-2024-096 — DDR5 RAM × 300');
+      goToPage('po');
+    }
+  }
+
+  /* ---------- CSV EXPORT ---------- */
+  function exportCSV() {
+    const rows = [
+      ['Material ID', 'Description', 'On Hand', 'Safety Stock', 'Reorder Point', 'EOQ', 'Status'],
+      ['MAT-0041', 'GPU RTX 4080', 38, 80, 100, 150, 'Critical'],
+      ['MAT-0055', 'Intel Core i9-14900K', 14, 50, 75, 120, 'Critical'],
+      ['MAT-0103', 'NVMe SSD 1TB Gen4', 82, 60, 100, 200, 'Low'],
+      ['MAT-0119', 'Motherboard Z790', 67, 40, 60, 80, 'Low'],
+      ['MAT-0087', 'DDR5 RAM 32GB Kit', 215, 80, 120, '-', 'OK'],
+      ['MAT-0162', 'PSU 850W Gold', 304, 100, 150, '-', 'OK'],
+      ['MAT-0178', 'CPU Cooler 360mm AIO', 188, 60, 90, '-', 'OK'],
+      ['MAT-0201', 'Case ATX Mid-Tower', 143, 50, 80, '-', 'OK']
+    ];
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'apextech-stock-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ---------- AI QUICK PROMPT CHIPS ---------- */
+  function fillPrompt(btn) {
+    document.getElementById('ai-input').value = btn.textContent.trim();
+    document.getElementById('ai-input').focus();
+  }
+
+  /* ---------- AI SUPPLY PLANNER ---------- */
+  async function sendToAI() {
+    const inputEl   = document.getElementById('ai-input');
+    const responseEl = document.getElementById('ai-response');
+    const query = inputEl.value.trim();
+    if (!query) return;
+
+    responseEl.style.color = 'var(--apex-muted)';
+    responseEl.innerHTML   = '<i class="ti ti-loader-2 spinning"></i> AI sedang menganalisis data supply chain...';
+
+    const systemPrompt = `Kamu adalah AI Supply Planner untuk ApexTech Logistics, perusahaan distribusi komponen hardware.
+
+DATA INVENTORI SAAT INI:
+- GPU RTX 4080 (MAT-0041): 38 unit, safety stock 80, CRITICAL — perkiraan stockout 4 hari lagi
+- Intel Core i9-14900K (MAT-0055): 14 unit, safety stock 50, CRITICAL
+- NVMe SSD 1TB Gen4 (MAT-0103): 82 unit, safety stock 60, LOW
+- Motherboard Z790 (MAT-0119): 67 unit, safety stock 40, LOW
+- DDR5 RAM 32GB (MAT-0087): 215 unit, OK
+- PSU 850W Gold (MAT-0162): 304 unit, OK
+
+DATA VENDOR:
+- NexaSemi Corp: on-time delivery 78%, lead time 7 hari, vendor score 78 (delay issues)
+- SiliconBridge Ltd: on-time delivery 94%, lead time 5 hari, vendor score 94 (preferred)
+- StoragePro Asia: on-time delivery 61%, lead time 4 hari, vendor score 61 (under review)
+- MemCore Technologies: on-time delivery 97%, lead time 3 hari, vendor score 97 (top vendor)
+- PCBWorld Inc: on-time delivery 88%, lead time 6 hari, vendor score 88
+
+PO TERBUKA:
+- PO-2024-091: NexaSemi Corp, GPU RTX 4080 × 150, $127,500 (Urgent)
+- PO-2024-089: StoragePro Asia, NVMe SSD × 200, $30,000 (Delayed +3 hari)
+
+Berikan analisis dan rekomendasi yang actionable, spesifik, dan ringkas. Gunakan poin-poin bernomor untuk action items. Jawab dalam Bahasa Indonesia.`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: query }]
+        })
+      });
+
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+
+      const text = (data.content || []).map(b => b.text || '').join('');
+      responseEl.style.color = 'var(--apex-text)';
+      responseEl.textContent  = text || 'Tidak ada respons.';
+
+    } catch (err) {
+      responseEl.style.color   = 'var(--apex-red)';
+      responseEl.textContent   = 'Koneksi error: ' + err.message + '. Pastikan API key tersedia.';
+    }
+
+    inputEl.value = '';
+  }
+
+  /* Enter key to submit (Shift+Enter = new line) */
+  document.getElementById('ai-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendToAI();
+    }
+  });
+</script>
+
+</body>
+</html>
